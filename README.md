@@ -80,4 +80,4 @@ release-materials/     应用商店文案、图标、截图和测试报告
 
 ## 版权
 
-Copyright (c) 2026 Han Yongliang。保留所有权利。本仓库源代码公开展示，但未授予开源许可；未经书面许可不得复制、分发或用于派生作品。第三方组件仍适用其各自许可证。
+本项目基于 [MIT License](LICENSE) 开源，Copyright (c) 2026 Han Yongliang。第三方组件仍适用其各自许可证，详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
