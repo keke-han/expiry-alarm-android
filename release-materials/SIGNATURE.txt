@@ -1,0 +1,11 @@
+到期闹钟 0.1.5 APK 签名验证
+
+验证结果：通过
+签名方案：APK Signature Scheme v2
+签名者数量：1
+证书主题：CN=DaoQiJi Test, OU=Local Test, O=DaoQiJi, L=Local, ST=Local, C=CN
+证书 SHA-256：2ef940c2d7fc240f1bc35e54147a02f037fdb6274c9b050546b5dfc1a235c82b
+证书 SHA-1：50582a230c35233de3d16b359a4b93ef1d46fd58
+公钥算法：RSA 2048 位
+
+后续覆盖升级必须继续使用同一个 keystore 签名。

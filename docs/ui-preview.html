@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>到期闹钟 UI 预览</title>
+  <link rel="icon" type="image/png" href="branding/app-icon-512.png">
+  <style>
+    :root {
+      color-scheme: light;
+      --surface: #ffffff;
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --line: #e5e5ea;
+      --field-line: #c7c7cc;
+      --blue: #007aff;
+      --green: #1f9d55;
+      --green-soft: #f5faf7;
+      --green-line: #d8eee0;
+      --yellow: #f2a900;
+      --red: #ff3b30;
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --surface: #121214;
+      --text: #f2f2f7;
+      --muted: #aeaeb8;
+      --line: #38383c;
+      --field-line: #63636b;
+      --blue: #5aa7ff;
+      --green: #62d694;
+      --green-soft: #18261f;
+      --green-line: #304b3c;
+      --red: #ff6961;
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #ededf0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button, textarea, input { font: inherit; }
+    button { cursor: pointer; }
+
+    .phone {
+      width: min(390px, 100vw);
+      height: min(844px, 100vh);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+    }
+
+    header {
+      height: 64px;
+      flex: 0 0 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      background: var(--surface);
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    h1 {
+      font-size: 21px;
+      line-height: 1.2;
+      font-weight: 700;
+    }
+
+    .icon-button {
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: transparent;
+      color: var(--blue);
+    }
+
+    .icon-button svg { width: 22px; height: 22px; stroke-width: 2; }
+
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 20px 24px;
+      scrollbar-width: none;
+    }
+
+    .content::-webkit-scrollbar { display: none; }
+
+    .workspace h2 {
+      font-size: 25px;
+      line-height: 1.25;
+      font-weight: 750;
+    }
+
+    .instruction {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .input-wrap {
+      position: relative;
+      margin-top: 12px;
+      min-height: 116px;
+      border: 1px solid var(--field-line);
+      border-radius: 8px;
+      background: var(--surface);
+    }
+
+    textarea {
+      display: block;
+      width: 100%;
+      min-height: 114px;
+      resize: none;
+      border: 0;
+      outline: none;
+      padding: 14px 48px 14px 14px;
+      color: var(--text);
+      background: transparent;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    textarea::placeholder { color: #9a9aa0; }
+
+    .voice-button {
+      position: absolute;
+      right: 6px;
+      bottom: 6px;
+    }
+
+    .parsed {
+      margin-top: 14px;
+      padding: 14px 16px 4px;
+      border: 1px solid var(--green-line);
+      border-radius: 8px;
+      background: var(--green-soft);
+    }
+
+    .parsed-heading {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 8px;
+      color: var(--green);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .parsed-heading svg { width: 21px; height: 21px; }
+
+    .parsed-row {
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-top: 1px solid var(--green-line);
+      font-size: 15px;
+    }
+
+    .parsed-label { color: var(--muted); flex-shrink: 0; }
+    .parsed-value { font-weight: 600; text-align: right; overflow-wrap: anywhere; }
+
+    .input-actions {
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .text-button {
+      border: 0;
+      padding: 8px 0 8px 16px;
+      color: var(--blue);
+      background: transparent;
+      font-size: 14px;
+    }
+
+    .primary {
+      width: 100%;
+      height: 50px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .primary:disabled { background: #b8d7fb; cursor: default; }
+
+    .recent { margin-top: 26px; }
+
+    .recent h3 {
+      margin-bottom: 8px;
+      color: var(--text);
+      font-size: 17px;
+      line-height: 1.25;
+      font-weight: 700;
+    }
+
+    .record {
+      width: 100%;
+      min-height: 72px;
+      display: grid;
+      grid-template-columns: 10px minmax(0, 1fr) auto 20px;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--text);
+      background: transparent;
+      text-align: left;
+    }
+
+    .dot { width: 9px; height: 9px; border-radius: 50%; }
+
+    .record-title {
+      display: block;
+      overflow: hidden;
+      font-size: 16px;
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .record-date {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .remaining { font-size: 15px; font-weight: 600; white-space: nowrap; }
+    .record svg { width: 19px; height: 19px; color: #aeaeb2; }
+
+    dialog {
+      width: min(330px, calc(100vw - 40px));
+      border: 0;
+      border-radius: 8px;
+      padding: 20px;
+      color: var(--text);
+      background: var(--surface);
+    }
+
+    dialog::backdrop { background: rgba(0, 0, 0, 0.28); }
+    .dialog-title { font-size: 18px; font-weight: 700; }
+
+    .dialog-copy {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .dialog-actions { margin-top: 18px; display: flex; justify-content: flex-end; }
+    .dialog-copy { white-space: pre-line; }
+    #back-button { margin-left: -10px; }
+    header.settings-header { justify-content: flex-start; gap: 8px; }
+    .settings-heading { color: var(--muted); font-size: 13px; font-weight: 600; margin: 24px 0 8px; }
+    .theme-options { display: flex; justify-content: space-between; padding: 8px 0 20px; border-bottom: 1px solid var(--line); }
+    .theme-options label { display: flex; gap: 7px; align-items: center; min-height: 48px; font-size: 14px; cursor: pointer; }
+    .theme-options input { accent-color: var(--blue); width: 18px; height: 18px; margin: 0; }
+    .setting-row { width: 100%; min-height: 60px; display: flex; align-items: center; gap: 8px; padding: 14px 0; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--text); text-align: left; }
+    .setting-name { flex: 1; font-size: 16px; font-weight: 500; }
+    .setting-value { color: var(--muted); font-size: 14px; }
+    .setting-row svg { width: 20px; height: 20px; color: var(--muted); }
+    .settings-note { font-size: 12px; color: var(--muted); line-height: 1.6; padding-top: 10px; }
+    .settings-footer { padding: 28px 0 12px; font-size: 12px; color: var(--muted); }
+    #setting-input { width: 100%; min-height: 48px; margin-top: 16px; padding: 10px; color: var(--text); background: var(--surface); border: 1px solid var(--field-line); border-radius: 6px; }
+    #setting-editor label { display: block; margin-top: 16px; font-size: 14px; }
+    button:focus-visible, input:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+    :root[data-theme="dark"] .primary { color: #081a30; }
+    :root[data-theme="dark"] .primary:disabled { background: #30445d; color: #b3c0d2; }
+
+    @media (min-width: 520px) {
+      .phone {
+        border: 1px solid #d7d7dc;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.14);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="phone" aria-label="到期闹钟 UI 预览">
+    <header>
+      <button class="icon-button" id="back-button" aria-label="返回" title="返回" hidden><i data-lucide="arrow-left" aria-hidden="true"></i></button>
+      <h1 id="page-title">到期闹钟</h1>
+      <button class="icon-button" id="settings-button" aria-label="设置"><i data-lucide="settings" aria-hidden="true"></i></button>
+    </header>
+
+    <section class="content" id="home-page">
+      <section class="workspace">
+        <h2>添加到期提醒</h2>
+        <p class="instruction">一句话输入事项、到期时间和提前多久提醒</p>
+
+        <div class="input-wrap">
+          <textarea id="reminder-input" spellcheck="false" placeholder="例如：护照2029年5月10日到期，提前3个月提醒">身份证2030年1月1日到期，提前30天提醒</textarea>
+          <button class="icon-button voice-button" id="voice-button" aria-label="语音输入"><i data-lucide="mic" aria-hidden="true"></i></button>
+        </div>
+
+        <section class="parsed" id="parsed-panel" aria-live="polite">
+          <div class="parsed-heading"><i data-lucide="circle-check" aria-hidden="true"></i><span>已识别</span></div>
+          <div class="parsed-row"><span class="parsed-label">事项</span><span class="parsed-value" id="parsed-title">身份证</span></div>
+          <div class="parsed-row"><span class="parsed-label">到期时间</span><span class="parsed-value" id="parsed-date">2030-01-01</span></div>
+          <div class="parsed-row"><span class="parsed-label">提前提醒</span><span class="parsed-value" id="parsed-days">30天</span></div>
+        </section>
+
+        <div class="input-actions"><button class="text-button" id="clear-button">清空输入</button></div>
+        <button class="primary" id="add-button">确认添加</button>
+      </section>
+
+      <section class="recent">
+        <h3>最近记录</h3>
+        <div id="record-list">
+          <button class="record" data-title="银行卡">
+            <span class="dot" style="background: var(--red)"></span>
+            <span><span class="record-title">银行卡</span><span class="record-date">2026-09-23 · 提前 30 天</span></span>
+            <span class="remaining" style="color: var(--red)">22天</span>
+            <i data-lucide="chevron-right" aria-hidden="true"></i>
+          </button>
+          <button class="record" data-title="Netflix">
+            <span class="dot" style="background: var(--yellow)"></span>
+            <span><span class="record-title">Netflix</span><span class="record-date">2026-11-16 · 提前 7 天</span></span>
+            <span class="remaining" style="color: var(--yellow)">76天</span>
+            <i data-lucide="chevron-right" aria-hidden="true"></i>
+          </button>
+        </div>
+      </section>
+    </section>
+
+    <section class="content" id="settings-page" aria-label="设置" hidden>
+      <h2 class="settings-heading">外观</h2>
+      <div class="theme-options" role="radiogroup" aria-label="主题">
+        <label><input type="radio" name="theme" value="system" checked>跟随系统</label>
+        <label><input type="radio" name="theme" value="light">浅色</label>
+        <label><input type="radio" name="theme" value="dark">深色</label>
+      </div>
+      <h2 class="settings-heading">提醒</h2>
+      <button class="setting-row" id="notification-settings"><span class="setting-name">通知权限</span><span class="setting-value">实机查看</span><i data-lucide="chevron-right" aria-hidden="true"></i></button>
+      <button class="setting-row" id="test-notification"><span class="setting-name">发送测试通知</span><i data-lucide="chevron-right" aria-hidden="true"></i></button>
+      <button class="setting-row" id="time-setting"><span class="setting-name">每日提醒时间</span><span class="setting-value" id="time-value">09:00</span><i data-lucide="chevron-right" aria-hidden="true"></i></button>
+      <button class="setting-row" id="days-setting"><span class="setting-name">默认提前提醒</span><span class="setting-value" id="days-value">30 天</span><i data-lucide="chevron-right" aria-hidden="true"></i></button>
+      <p class="settings-note">默认提前天数仅用于未注明提前时间的新事项。提醒可能因系统省电策略延迟。</p>
+      <h2 class="settings-heading">关于</h2>
+      <button class="setting-row" id="feedback-button"><span class="setting-name">意见反馈</span><i data-lucide="chevron-right" aria-hidden="true"></i></button>
+      <button class="setting-row" id="privacy-button"><span class="setting-name">隐私说明</span><i data-lucide="chevron-right" aria-hidden="true"></i></button>
+      <div class="setting-row"><span class="setting-name">当前版本</span><span class="setting-value">0.1.1</span></div>
+      <p class="settings-footer">到期闹钟</p>
+    </section>
+  </main>
+
+  <dialog id="preview-dialog">
+    <div class="dialog-title" id="dialog-title">设置</div>
+    <div class="dialog-copy" id="dialog-copy">通知提醒将在每天 09:00 检查待提醒事项。</div>
+    <div class="dialog-actions"><button class="text-button" id="dialog-close">关闭</button></div>
+  </dialog>
+
+  <dialog id="setting-editor">
+    <form id="setting-form">
+      <h2 class="dialog-title" id="editor-title"></h2>
+      <label for="setting-input" id="editor-label"></label>
+      <input id="setting-input" required>
+      <p class="settings-note" id="editor-note"></p>
+      <div class="dialog-actions">
+        <button class="text-button" id="editor-cancel" type="button">取消</button>
+        <button class="text-button" type="submit">保存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+  <script>
+    const input = document.querySelector("#reminder-input");
+    const parsedPanel = document.querySelector("#parsed-panel");
+    const parsedTitle = document.querySelector("#parsed-title");
+    const parsedDate = document.querySelector("#parsed-date");
+    const parsedDays = document.querySelector("#parsed-days");
+    const clearButton = document.querySelector("#clear-button");
+    const addButton = document.querySelector("#add-button");
+    const dialog = document.querySelector("#preview-dialog");
+    const dialogTitle = document.querySelector("#dialog-title");
+    const dialogCopy = document.querySelector("#dialog-copy");
+    const settingsKey = "daoqiji-preview-settings";
+    let settings = { theme: "system", days: 30, time: "09:00" };
+    try {
+      const saved = JSON.parse(localStorage.getItem(settingsKey));
+      if (saved && ["system", "light", "dark"].includes(saved.theme) &&
+          Number.isInteger(saved.days) && saved.days >= 0 && saved.days <= 3650 &&
+          /^([01]\d|2[0-3]):[0-5]\d$/.test(saved.time)) settings = saved;
+    } catch { /* Invalid or unavailable preview storage uses defaults. */ }
+    const systemTheme = matchMedia("(prefers-color-scheme: dark)");
+
+    function renderSettings() {
+      document.documentElement.dataset.theme = settings.theme === "system"
+        ? (systemTheme.matches ? "dark" : "light") : settings.theme;
+      document.querySelectorAll('input[name="theme"]').forEach(radio => {
+        radio.checked = radio.value === settings.theme;
+      });
+      document.querySelector("#time-value").textContent = settings.time;
+      document.querySelector("#days-value").textContent = `${settings.days} 天`;
+      renderParsed();
+    }
+
+    function saveSettings(updated) {
+      try { localStorage.setItem(settingsKey, JSON.stringify(updated)); }
+      catch {
+        showDialog("设置未保存", "浏览器未允许本地存储，请检查浏览器设置。");
+        renderSettings();
+        return;
+      }
+      settings = updated;
+      renderSettings();
+    }
+
+    function parseReminder(value) {
+      const dateMatch = value.match(/(\d{4})-(\d{1,2})-(\d{1,2})/) || value.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+      if (!dateMatch) return null;
+      const reminderMatch = value.match(/提前\s*(\d+)\s*(年|个月|月|天|日)/);
+      const amount = reminderMatch ? Number(reminderMatch[1]) : settings.days;
+      const unit = reminderMatch ? reminderMatch[2] : "天";
+      const days = unit === "年" ? amount * 365 : (unit === "个月" || unit === "月" ? amount * 30 : amount);
+      const title = value
+        .replace(dateMatch[0], "")
+        .replace(reminderMatch ? reminderMatch[0] : "", "")
+        .replaceAll("到期", "")
+        .replaceAll("提醒", "")
+        .replace(/[，,。；;：:]+/g, " ")
+        .trim()
+        .replace(/\s+/g, " ");
+      if (!title) return null;
+      const date = `${dateMatch[1]}-${dateMatch[2].padStart(2, "0")}-${dateMatch[3].padStart(2, "0")}`;
+      return { title, date, days };
+    }
+
+    function renderParsed() {
+      const parsed = parseReminder(input.value);
+      parsedPanel.hidden = !parsed;
+      clearButton.hidden = !input.value.trim();
+      addButton.disabled = !input.value.trim();
+      if (!parsed) return;
+      parsedTitle.textContent = parsed.title;
+      parsedDate.textContent = parsed.date;
+      parsedDays.textContent = `${parsed.days}天`;
+    }
+
+    function showDialog(title, copy) {
+      dialogTitle.textContent = title;
+      dialogCopy.textContent = copy;
+      dialog.showModal();
+    }
+
+    input.addEventListener("input", renderParsed);
+    clearButton.addEventListener("click", () => {
+      input.value = "";
+      input.focus();
+      renderParsed();
+    });
+    addButton.addEventListener("click", () => {
+      const parsed = parseReminder(input.value);
+      if (!parsed) {
+        showDialog("没有识别到日期", "请补充明确的到期时间后再确认添加。");
+        return;
+      }
+      showDialog("添加成功", `已添加“${parsed.title}”，将在到期前${parsed.days}天提醒。`);
+    });
+    document.querySelector("#voice-button").addEventListener("click", () => showDialog("语音输入", "Android App 中将调用系统语音识别；手机没有兼容服务时会提示使用键盘输入。"));
+    function openSettings(open) {
+      document.querySelector("#home-page").hidden = open;
+      document.querySelector("#settings-page").hidden = !open;
+      document.querySelector("#back-button").hidden = !open;
+      document.querySelector("#settings-button").hidden = open;
+      document.querySelector("#page-title").textContent = open ? "设置" : "到期闹钟";
+      document.querySelector("header").classList.toggle("settings-header", open);
+      document.querySelector(open ? "#back-button" : "#settings-button").focus();
+    }
+    document.querySelector("#settings-button").addEventListener("click", () => openSettings(true));
+    document.querySelector("#back-button").addEventListener("click", () => openSettings(false));
+    document.querySelectorAll('input[name="theme"]').forEach(radio => {
+      radio.addEventListener("change", () => saveSettings({ ...settings, theme: radio.value }));
+    });
+    systemTheme.addEventListener("change", renderSettings);
+    document.querySelector("#notification-settings").addEventListener("click", () => showDialog("通知权限", "网页预览无法读取手机的通知权限。请在安卓 App 中查看真实状态并打开系统通知设置。"));
+    document.querySelector("#test-notification").addEventListener("click", () => showDialog("测试通知", "网页预览不会发送安卓通知。请在手机上的到期闹钟 App 中测试，并查看通知栏是否收到。"));
+    document.querySelector("#feedback-button").addEventListener("click", () => showDialog("意见反馈", "韩永亮\nachilles042178@outlook.com"));
+    document.querySelector("#privacy-button").addEventListener("click", () => showDialog("隐私说明", "事项和设置仅保存在本机，不注册账号，不上传到我们的服务器，不提供云同步。卸载应用或清除应用数据会删除记录。本应用不提供换机同步，请勿依赖自动迁移。\n\n文字解析在本机完成。语音输入由手机的系统语音服务提供，是否联网以及如何处理语音，取决于该服务及其隐私政策。\n\n开启通知后，事项名称可能显示在锁屏通知中，可在系统通知设置中调整。\n\n开发者：韩永亮\n联系邮箱：achilles042178@outlook.com"));
+    const editor = document.querySelector("#setting-editor");
+    const settingInput = document.querySelector("#setting-input");
+    let editingSetting = "days";
+    function editSetting(kind) {
+      editingSetting = kind;
+      const isDays = kind === "days";
+      document.querySelector("#editor-title").textContent = isDays ? "默认提前提醒" : "每日提醒时间";
+      document.querySelector("#editor-label").textContent = isDays ? "提前天数" : "提醒时间";
+      document.querySelector("#editor-note").textContent = isDays ? "0–3650 天，0 表示到期当天" : "系统可能延迟发送，不是精确闹钟。";
+      settingInput.type = isDays ? "number" : "time";
+      settingInput.min = isDays ? "0" : "00:00";
+      settingInput.max = isDays ? "3650" : "23:59";
+      settingInput.step = isDays ? "1" : "60";
+      settingInput.value = String(settings[kind]);
+      editor.showModal();
+    }
+    document.querySelector("#days-setting").addEventListener("click", () => editSetting("days"));
+    document.querySelector("#time-setting").addEventListener("click", () => editSetting("time"));
+    document.querySelector("#editor-cancel").addEventListener("click", () => editor.close());
+    document.querySelector("#setting-form").addEventListener("submit", event => {
+      event.preventDefault();
+      if (!settingInput.reportValidity()) return;
+      editor.close();
+      saveSettings({ ...settings, [editingSetting]: editingSetting === "days" ? Number(settingInput.value) : settingInput.value });
+    });
+    document.querySelectorAll(".record").forEach((record) => {
+      record.addEventListener("click", () => showDialog("编辑提醒", `这里可以编辑或删除“${record.dataset.title}”。`));
+    });
+    document.querySelector("#dialog-close").addEventListener("click", () => dialog.close());
+
+    renderSettings();
+    lucide.createIcons();
+    if (location.hash === "#settings") openSettings(true);
+  </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>到期闹钟图标检查</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 32px; font: 16px system-ui; color: #242426; background: #f2f3f5; }
+  h1 { font-size: 22px; margin: 0 0 28px; }
+  .samples { display: flex; gap: 32px; flex-wrap: wrap; align-items: end; }
+  figure { margin: 0; text-align: center; }
+  figcaption { font-size: 13px; margin-top: 12px; color: #626269; }
+  .icon { width: var(--size, 144px); height: var(--size, 144px); position: relative; overflow: hidden; border-radius: 23%; }
+  .round { border-radius: 50%; }
+  .layer { position: absolute; inset: -25%; background: #007aff; }
+  .layer img { position: absolute; left: 12%; top: 12%; width: 76%; height: 76%; }
+</style>
+<h1>到期闹钟</h1>
+<div class="samples">
+  <figure><div class="icon"><div class="layer"><img src="app-icon-512.png" alt="31号日历和铃铛"></div></div><figcaption>圆角方形</figcaption></figure>
+  <figure><div class="icon round"><div class="layer"><img src="app-icon-512.png" alt="圆形裁切"></div></div><figcaption>圆形</figcaption></figure>
+  <figure><div class="icon" style="--size:64px"><div class="layer"><img src="app-icon-512.png" alt="64像素图标"></div></div><figcaption>64 px</figcaption></figure>
+  <figure><div class="icon round" style="--size:48px"><div class="layer"><img src="app-icon-512.png" alt="48像素圆形图标"></div></div><figcaption>48 px</figcaption></figure>
+</div>
+</html>
