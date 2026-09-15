@@ -1,0 +1,6 @@
+# Copy this file to daoqiji-release.properties and replace every placeholder.
+# Never commit the real properties file or keystore.
+storeFile=keystore/your-release-key.jks
+storePassword=replace-with-local-password
+keyAlias=replace-with-key-alias
+keyPassword=replace-with-local-password
